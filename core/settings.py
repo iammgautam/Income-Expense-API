@@ -127,3 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #CUstom add-ons
 AUTH_USER_MODEL = 'authentication.User'
+
+REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY':'error',
+}

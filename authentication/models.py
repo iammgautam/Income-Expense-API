@@ -14,7 +14,7 @@ class UserManager(BaseUserManager):
             raise ValueError("You must provide an Email")
 
         user = self.model(username=username, email=self.normalize_email(email), **other_fields)
-        user.set_passowrd(password)
+        user.set_password(password)
         user.save()
         return user
 
@@ -30,7 +30,7 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.ChatField(max_length=255, unique=True, db_index = True)
+    username = models.CharField(max_length=255, unique=True, db_index = True)
     email = models.EmailField(max_length=255, unique=True,db_index = True)
     is_verified = models.BooleanField(default=False)
     is_active =  models.BooleanField(default=True)
@@ -41,7 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    object = UserManager()
+    objects = UserManager()
 
     def __str__(self):
         return self.email
