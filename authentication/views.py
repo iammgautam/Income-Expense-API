@@ -1,15 +1,15 @@
+import jwt
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.shortcuts import render
 from django.urls import reverse
-
 from rest_framework import generics, status
 from rest_framework.response import Response
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
 from authentication.serializers import RegisterSerializer
 from authentication.utils import Utils
+
 
 #class for registering account 
 class RegistraterViews(generics.GenericAPIView):
@@ -53,6 +53,30 @@ class RegistraterViews(generics.GenericAPIView):
 
         return Response(user_data, status = status.HTTP_201_CREATED)
 
+#this class with verify the link that wwas sent in the email
 class VerifyEmail(generics.GenericAPIView):
-    def get(self):
-        pass
+    def get(self,request):
+        #store the token from the link in the token variable
+        token = request.get.GET('token')
+        #if token is available
+        try:
+            #decode the token and confirm it with the SECRET_KEY of the 
+            payload = jwt.decode(token, settings.SECRET_KEY)
+            #get the user by it user_id
+            user = User.objects.get(id=payload['user_id'])
+            #checks if the user is_verified or not
+            if not user.is_verified:
+                #if not then verify it
+                user.is_verified = True
+                #and save the user
+                user.save()
+
+            return Response({'email':'Successfully Activated'}, status=status.HTTP_200_OK)
+
+        #if the token linked expired
+        except jwt.ExpiredSignatureError as identifier:
+            return Response({'error':'Activation Linked Expired'}, status=status.HTTP_408_REQUEST_TIMEOUT)
+            
+        #if the token link is invalid
+        except jwt.exceptions.DecodeError as identifier:
+            return Response({'error':'Invalid Token'}, status=status.HTTP_409_CONFLICT)
