@@ -1,10 +1,11 @@
 from django.db import models
 
-# Create your models here.
+#import for making Custom User Model
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager):    #UserManager Class for Custom User
 
+    #function for nomal user
     def create_user(self, username, email, password=None, **other_fields):
 
         if username is None:
@@ -18,6 +19,7 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+    #function for super user
     def create_superuser(self, username, email, password=None, **other_fields):
 
         if password is None:
@@ -29,8 +31,9 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+#Custom Base User Model
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=255, unique=True, db_index = True)
+    username = models.CharField(max_length=255, unique=True, db_index = True)   #'db_index'==True means it is indexable in db
     email = models.EmailField(max_length=255, unique=True,db_index = True)
     is_verified = models.BooleanField(default=False)
     is_active =  models.BooleanField(default=True)
@@ -41,6 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    #need a objects for Querying data and all.
     objects = UserManager()
 
     def __str__(self):
