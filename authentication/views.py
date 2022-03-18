@@ -57,11 +57,11 @@ class RegistraterViews(generics.GenericAPIView):
 class VerifyEmail(generics.GenericAPIView):
     def get(self,request):
         #store the token from the link in the token variable
-        token = request.get.GET('token')
+        token = request.GET.get('token')
         #if token is available
         try:
             #decode the token and confirm it with the SECRET_KEY of the 
-            payload = jwt.decode(token, settings.SECRET_KEY)
+            payload = jwt.decode(token, settings.SECRET_KEY,algorithms='HS256')
             #get the user by it user_id
             user = User.objects.get(id=payload['user_id'])
             #checks if the user is_verified or not
@@ -76,7 +76,7 @@ class VerifyEmail(generics.GenericAPIView):
         #if the token linked expired
         except jwt.ExpiredSignatureError as identifier:
             return Response({'error':'Activation Linked Expired'}, status=status.HTTP_408_REQUEST_TIMEOUT)
-            
+
         #if the token link is invalid
         except jwt.exceptions.DecodeError as identifier:
             return Response({'error':'Invalid Token'}, status=status.HTTP_409_CONFLICT)
