@@ -1,16 +1,17 @@
+
 import jwt
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from rest_framework import generics, status
+from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
-from authentication.serializers import RegisterSerializer
+from authentication.serializers import RegisterSerializer, emailVerificationSerializer
 from authentication.utils import Utils
-
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 #class for registering account 
 class RegistraterViews(generics.GenericAPIView):
     #using the custom serializer for api calls
@@ -54,7 +55,12 @@ class RegistraterViews(generics.GenericAPIView):
         return Response(user_data, status = status.HTTP_201_CREATED)
 
 #this class with verify the link that wwas sent in the email
-class VerifyEmail(generics.GenericAPIView):
+class VerifyEmail(views.APIView):
+
+    serializer_class = emailVerificationSerializer
+
+    token_param_config = openapi.Parameter('token',in_=openapi.IN_QUERY, descriptor='Description', type=openapi.TYPE_STRING)
+    @swagger_auto_schema(manual_parameters = [token_param_config])
     def get(self,request):
         #store the token from the link in the token variable
         token = request.GET.get('token')
