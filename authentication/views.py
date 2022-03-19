@@ -3,15 +3,18 @@ import jwt
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
-from authentication.serializers import RegisterSerializer, emailVerificationSerializer
+from authentication.serializers import (LoginSerializer, RegisterSerializer,
+                                        emailVerificationSerializer)
 from authentication.utils import Utils
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
+
 #class for registering account 
 class RegistraterViews(generics.GenericAPIView):
     #using the custom serializer for api calls
@@ -86,3 +89,15 @@ class VerifyEmail(views.APIView):
         #if the token link is invalid
         except jwt.exceptions.DecodeError as identifier:
             return Response({'error':'Invalid Token'}, status=status.HTTP_409_CONFLICT)
+
+#class for Login
+class LoginAPIView(generics.GenericAPIView):
+
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        user = request.data
+        serializers = self.serializer_class(data= user)
+        serializers.is_valid(raise_exception=True)
+
+        return Response(serializers.data, status=status.HTTP_200_OK)

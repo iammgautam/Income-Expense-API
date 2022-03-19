@@ -1,5 +1,6 @@
+from os import access
 from django.db import models
-
+from rest_framework_simplejwt.tokens import RefreshToken
 #import for making Custom User Model
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
@@ -51,4 +52,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def token(self):
-        return ' '
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh':str(refresh),
+            'access':str(refresh.access_token)
+        }
