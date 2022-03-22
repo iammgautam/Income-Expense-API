@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'authentication.apps.AuthenticationConfig',
+    'expenses.apps.ExpensesConfig',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +144,14 @@ EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORTS=587
 EMAIL_HOST_USER=os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD=os.environ.get('EMAIL_HOST_PASSWORD')
+
+#SWAGGER SETTINGS
+SWAGGER_SETTINGS={
+    'SECURITY_DEFINITIONS':{
+        'Bearer':{
+            'type':'apiKey',
+            'name':'Authorization',
+            'in':'header'
+        }
+    }
+}
